@@ -4,12 +4,15 @@ import {OrderService} from './order-items/order.service';
 import {CartItem} from '../shopping-cart/cart-item.model';
 import {Order, OrderItem} from './order.model';
 import {Router} from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'mt-order',
   templateUrl: './order.component.html',
 })
 export class OrderComponent implements OnInit {
+
+  orderForm: FormGroup;
 
   delivery = 8;
 
@@ -18,9 +21,22 @@ export class OrderComponent implements OnInit {
     {label: 'Cartão de Débito', value: 'DEB'},
     {label: 'Cartão Refeição', value: 'REF'},
   ];
-  constructor(private orderService: OrderService, private router: Router) { }
+  constructor(private orderService: OrderService, private router: Router, private formBuilder: FormBuilder) { }
 
   ngOnInit() {
+
+    let emailPattern: RegExp = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    let numberPattern: RegExp = /^[0-9]*$/;
+
+    this.orderForm = this.formBuilder.group({
+      name: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
+      email: this.formBuilder.control('', [Validators.required, Validators.pattern(emailPattern)]),
+      emailConfirmation: this.formBuilder.control('', [Validators.required, Validators.pattern(emailPattern)]),
+      address: this.formBuilder.control('', [Validators.required, Validators.minLength(5)]),
+      number: this.formBuilder.control('', [Validators.required, Validators.pattern(numberPattern)]),
+      optionalAddress: this.formBuilder.control(''),
+      paymentOption: this.formBuilder.control('', [Validators.required]),
+    });
   }
 
   itemsValue(): number {
